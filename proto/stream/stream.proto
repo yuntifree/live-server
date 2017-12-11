@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package stream;
+
+service Stream {
+    rpc Create(CreateRequest) returns (CreateResponse) {}
+}
+
+message CreateRequest {
+    int64 uid = 1;
+}
+
+message CreateResponse {
+    string url = 1;
+    string stream = 2;
+}
