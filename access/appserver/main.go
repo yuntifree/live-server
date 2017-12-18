@@ -14,9 +14,10 @@ import (
 func main() {
 	router := gin.Default()
 	router.GET("/stream/:action", streamHandler)
+	router.POST("/user/:action", userHandler)
 
 	srv := &http.Server{
-		Addr:    ":9999",
+		Addr:    ":9898",
 		Handler: router,
 	}
 

@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package user;
+
+service User {
+    rpc Login(LoginRequest) returns (LoginResponse) {}
+}
+
+message LoginRequest {
+    string username = 1;
+    string passwd = 2;
+}
+
+message LoginResponse {
+    int64 uid = 1;
+    string token = 2;
+    int64 role = 3;
+}
