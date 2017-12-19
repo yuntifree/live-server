@@ -5,4 +5,6 @@ const (
 	StreamService = "go.micro.live.stream"
 	//UserService user service name
 	UserService = "go.micro.live.user"
+	//WithdrawService withdraw service name
+	WithdrawService = "go.micro.live.withdraw"
 )

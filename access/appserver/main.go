@@ -15,6 +15,7 @@ func main() {
 	router := gin.Default()
 	router.GET("/stream/:action", streamHandler)
 	router.POST("/user/:action", userHandler)
+	router.POST("/withdraw/:action", withdrawHandler)
 
 	srv := &http.Server{
 		Addr:    ":9898",

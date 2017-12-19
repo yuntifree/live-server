@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+package withdraw;
+
+service Withdraw {
+    rpc GetRecords(GetRequest) returns (RecordsResponse) {}
+}
+
+message GetRequest {
+    int64 seq = 1;
+    int64 num = 2;
+    int64 uid = 3;
+}
+
+message Record {
+    int64 id = 1;
+    int64 amount = 2;
+    string remark = 3;
+    string ctime = 4;
+    int64 status = 5;
+}
+
+message RecordsResponse {
+    repeated Record infos = 1;
+}

@@ -16,6 +16,29 @@ CREATE TABLE IF NOT EXISTS users
     UNIQUE KEY(name)
 ) ENGINE = InnoDB;
 
+CREATE TABLE IF NOT EXISTS user_info
+(
+    id      bigint unsigned NOT NULL AUTO_INCREMENT,
+    uid     int unsigned NOT NULL,
+    income  int unsigned NOT NULL DEFAULT 0,
+    apply   int unsigned NOT NULL DEFAULT 0,
+    withdraw    int unsigned NOT NULL DEFAULT 0,
+    PRIMARY KEY(id),
+    UNIQUE KEY(uid)
+) ENGINE = InnoDB;
+
+CREATE TABLE IF NOT EXISTS withdraw_history
+(
+    id      bigint unsigned NOT NULL AUTO_INCREMENT,
+    uid     int unsigned NOT NULL,
+    amount  int unsigned NOT NULL DEFAULT 0,
+    -- status 0:申请  1:成功 2:拒绝
+    status  tinyint unsigned NOT NULL DEFAULT 0,
+    ctime   datetime NOT NULL DEFAULT '2017-12-01',
+    PRIMARY KEY(id),
+    KEY(uid)
+) ENGINE = InnoDB;
+
 CREATE TABLE IF NOT EXISTS stream
 (
     id  bigint unsigned NOT NULL AUTO_INCREMENT,
