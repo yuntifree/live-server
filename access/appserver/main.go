@@ -16,6 +16,7 @@ func main() {
 	router.GET("/stream/:action", streamHandler)
 	router.POST("/user/:action", userHandler)
 	router.POST("/withdraw/:action", withdrawHandler)
+	router.POST("/order/:action", orderHandler)
 
 	srv := &http.Server{
 		Addr:    ":9898",

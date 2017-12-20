@@ -51,3 +51,21 @@ CREATE TABLE IF NOT EXISTS stream
     UNIQUE KEY(name),
     KEY(uid)
 ) ENGINE = InnoDB;
+
+CREATE TABLE IF NOT EXISTS orders
+(
+    id  bigint unsigned NOT NULL AUTO_INCREMENT,
+    oid varchar(64) NOT NULL,
+    uid int unsigned NOT NULL,
+    owner int unsigned NOT NULL,
+    hid   int unsigned NOT NULL,
+    price int unsigned NOT NULL DEFAULT 0,
+    fee   int unsigned NOT NULL DEFAULT 0,
+    status  tinyint unsigned NOT NULL DEFAULT 0,
+    ctime   datetime NOT NULL DEFAULT '2017-12-01',
+    ptime   datetime NOT NULL DEFAULT '2017-12-01',
+    PRIMARY KEY(id),
+    UNIQUE KEY(oid),
+    KEY(uid),
+    KEY(owner)
+) ENGINE = InnoDB;
