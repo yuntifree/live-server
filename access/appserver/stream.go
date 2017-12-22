@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"log"
 	"net/http"
 	"strconv"
 
@@ -16,6 +17,8 @@ func streamHandler(c *gin.Context) {
 	switch action {
 	case "get":
 		getStream(c)
+	case "notify":
+		notifyStream(c)
 	default:
 		c.JSON(http.StatusOK, gin.H{"errno": 101, "desc": "unknown action"})
 	}
@@ -35,4 +38,13 @@ func getStream(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, gin.H{"errno": 0, "url": rsp.Url,
 		"stream": rsp.Stream})
+}
+
+func notifyStream(c *gin.Context) {
+	id := c.Query("id")
+	ip := c.Query("ip")
+	action := c.Query("action")
+	appname := c.Query("appname")
+	log.Printf("action:%s id:%s ip:%s appname:%s", action, id, ip, appname)
+	c.JSON(http.StatusOK, gin.H{"errno": 0})
 }

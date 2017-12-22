@@ -9,4 +9,5 @@ const (
 	signVersion     = "1.0"
 	domain          = "live.yunxingzh.com"
 	host            = "https://live.aliyuncs.com"
+	appname         = "apptest"
 )

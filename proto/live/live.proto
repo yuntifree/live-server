@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+package live;
+
+service Live {
+    rpc Create(CreateRequest) returns (CreateResponse) {}
+}
+
+message CreateRequest {
+    int64 uid = 1;
+    string title = 2;
+    string cover = 3;
+    string depict = 4;
+    int64 authority = 5;
+    string passwd = 6;
+    int64 price = 7;
+    int64 resolution = 8;
+}
+
+message CreateResponse {
+    string push = 1;
+    string rtmp = 2;
+    string flv = 3;
+    string hls = 4;
+}

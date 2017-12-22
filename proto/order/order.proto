@@ -4,6 +4,7 @@ package order;
 
 service Order {
     rpc GetRecords(GetRequest) returns (RecordsResponse) {}
+    rpc GetRecharges(GetRequest) returns (RechargesResponse) {}
 }
 
 message GetRequest {
@@ -25,4 +26,17 @@ message Record {
 
 message RecordsResponse {
     repeated Record infos = 1;
+}
+
+message Recharge {
+    int64 id = 1;
+    string oid = 2;
+    string depict = 3;
+    int64 price = 4;
+    string ctime = 5;
+    int64 status = 6;
+}
+
+message RechargesResponse {
+    repeated Recharge infos = 1;
 }

@@ -9,4 +9,6 @@ const (
 	WithdrawService = "go.micro.live.withdraw"
 	//OrderService order service name
 	OrderService = "go.micro.live.order"
+	//LiveService live service name
+	LiveService = "go.micro.live.live"
 )

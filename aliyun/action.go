@@ -72,10 +72,79 @@ func DescribeLiveStreamPublishList(startTime, endTime string) string {
 	sign := genSign(m, accessKeySecret)
 	query := toString(m)
 	url := host + "?" + query + "Signature=" + sign
-	log.Printf("url:%s\n", url)
 	rsp, err := httputil.Request(url, "")
 	if err != nil {
 		log.Printf("DescribeLiveStreamPublishList failed:%s %v", url, err)
+		return ""
+	}
+	return rsp
+}
+
+//DescribeLiveStreamOnlineUserNum list online user num
+func DescribeLiveStreamOnlineUserNum() string {
+	m := fillCommParams()
+	m["Action"] = "DescribeLiveStreamOnlineUserNum"
+	m["DomainName"] = domain
+	sign := genSign(m, accessKeySecret)
+	query := toString(m)
+	url := host + "?" + query + "Signature=" + sign
+	rsp, err := httputil.Request(url, "")
+	if err != nil {
+		log.Printf("DescribeLiveStreamOnlineUserNum failed:%s %v", url, err)
+		return ""
+	}
+	return rsp
+}
+
+//ForbidLiveStream forbid live stream
+func ForbidLiveStream(stream string) string {
+	m := fillCommParams()
+	m["Action"] = "ForbidLiveStream"
+	m["DomainName"] = domain
+	m["AppName"] = appname
+	m["StreamName"] = stream
+	m["LiveStreamType"] = "publisher"
+	sign := genSign(m, accessKeySecret)
+	query := toString(m)
+	url := host + "?" + query + "Signature=" + sign
+	rsp, err := httputil.Request(url, "")
+	if err != nil {
+		log.Printf("ForbidLiveStream failed:%s %v", url, err)
+		return ""
+	}
+	return rsp
+}
+
+//ResumeLiveStream resume live stream
+func ResumeLiveStream(stream string) string {
+	m := fillCommParams()
+	m["Action"] = "ResumeLiveStream"
+	m["DomainName"] = domain
+	m["AppName"] = appname
+	m["StreamName"] = stream
+	m["LiveStreamType"] = "publisher"
+	sign := genSign(m, accessKeySecret)
+	query := toString(m)
+	url := host + "?" + query + "Signature=" + sign
+	rsp, err := httputil.Request(url, "")
+	if err != nil {
+		log.Printf("ResumeLiveStream failed:%s %v", url, err)
+		return ""
+	}
+	return rsp
+}
+
+//DescribeLiveStreamsFrameRateAndBitRateData stream frame rate and bitrate
+func DescribeLiveStreamsFrameRateAndBitRateData() string {
+	m := fillCommParams()
+	m["Action"] = "DescribeLiveStreamsFrameRateAndBitRateData"
+	m["DomainName"] = domain
+	sign := genSign(m, accessKeySecret)
+	query := toString(m)
+	url := host + "?" + query + "Signature=" + sign
+	rsp, err := httputil.Request(url, "")
+	if err != nil {
+		log.Printf("ResumeLiveStream failed:%s %v", url, err)
 		return ""
 	}
 	return rsp

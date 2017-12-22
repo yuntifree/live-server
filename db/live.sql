@@ -23,6 +23,7 @@ CREATE TABLE IF NOT EXISTS user_info
     income  int unsigned NOT NULL DEFAULT 0,
     apply   int unsigned NOT NULL DEFAULT 0,
     withdraw    int unsigned NOT NULL DEFAULT 0,
+    recharge    int unsigned NOT NULL DEFAULT 0,
     PRIMARY KEY(id),
     UNIQUE KEY(uid)
 ) ENGINE = InnoDB;
@@ -52,11 +53,31 @@ CREATE TABLE IF NOT EXISTS stream
     KEY(uid)
 ) ENGINE = InnoDB;
 
+CREATE TABLE IF NOT EXISTS live_history
+(
+    id      bigint unsigned NOT NULL AUTO_INCREMENT,
+    uid     int unsigned NOT NULL,
+    title   varchar(128) NOT NULL DEFAULT '',
+    cover   varchar(128) NOT NULL DEFAULT '',
+    depict  varchar(256) NOT NULL DEFAULT '',
+    -- authority 访问权限 0:公开 1:密码 2:付费
+    authority   tinyint unsigned NOT NULL DEFAULT 0,
+    passwd  varchar(16) NOT NULL DEFAULT '',
+    price   int unsigned NOT NULL DEFAULT 0,
+    resolution tinyint unsigned NOT NULL DEFAULT 0,
+    push    varchar(256) NOT NULL DEFAULT '',
+    ctime   datetime NOT NULL DEFAULT '2017-12-01',
+    PRIMARY KEY(id),
+    KEY(uid)
+) ENGINE = InnoDB;
+
 CREATE TABLE IF NOT EXISTS orders
 (
     id  bigint unsigned NOT NULL AUTO_INCREMENT,
     oid varchar(64) NOT NULL,
     uid int unsigned NOT NULL,
+    -- type 0:支付视频  1-充值
+    type    tinyint unsigned NOT NULL DEFAULT 0,
     owner int unsigned NOT NULL,
     hid   int unsigned NOT NULL,
     price int unsigned NOT NULL DEFAULT 0,

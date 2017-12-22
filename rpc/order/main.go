@@ -23,8 +23,8 @@ type Server struct{}
 func (s *Server) GetRecords(ctx context.Context, req *order.GetRequest,
 	rsp *order.RecordsResponse) error {
 	rows, err := db.Query(`SELECT o.id, o.hid, u.headurl, u.nickname, o.depict, o.price,
-	o.uid FROM orders o, users u WHERE o.uid = u.uid AND o.owner = ? ORDER BY id 
-	DESC LIMIT ?, ?`, req.Uid, req.Seq, req.Num)
+	o.uid FROM orders o, users u WHERE o.uid = u.uid AND o.owner = ? AND type = 0 
+	AND status = 1 ORDER BY id DESC LIMIT ?, ?`, req.Uid, req.Seq, req.Num)
 	if err == sql.ErrNoRows {
 		log.Printf("no more data for uid:%d seq:%d", req.Uid, req.Seq)
 		return nil
