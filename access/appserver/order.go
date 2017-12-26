@@ -16,6 +16,8 @@ func orderHandler(c *gin.Context) {
 	switch action {
 	case "records":
 		getOrderRecords(c)
+	case "recharges":
+		getOrderRecharges(c)
 	default:
 		c.JSON(http.StatusOK, gin.H{"errno": 101, "desc": "unknown action"})
 	}
@@ -30,6 +32,22 @@ func getOrderRecords(c *gin.Context) {
 	}
 	cl := order.NewOrderClient(accounts.OrderService, client.DefaultClient)
 	rsp, err := cl.GetRecords(context.Background(), &req)
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{"errno": 1, "desc": err.Error()})
+		return
+	}
+	log.Printf("rsp:%+v", rsp)
+	c.JSON(http.StatusOK, gin.H{"errno": 0, "infos": rsp.Infos})
+}
+
+func getOrderRecharges(c *gin.Context) {
+	var req order.GetRequest
+	if err := c.BindJSON(&req); err != nil {
+		c.JSON(http.StatusOK, gin.H{"errno": 102, "desc": "illegal param"})
+		return
+	}
+	cl := order.NewOrderClient(accounts.OrderService, client.DefaultClient)
+	rsp, err := cl.GetRecharges(context.Background(), &req)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{"errno": 1, "desc": err.Error()})
 		return

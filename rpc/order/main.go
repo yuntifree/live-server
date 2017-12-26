@@ -26,7 +26,7 @@ func (s *Server) GetRecords(ctx context.Context, req *order.GetRequest,
 	o.uid FROM orders o, users u WHERE o.uid = u.uid AND o.owner = ? AND type = 0 
 	AND status = 1 ORDER BY id DESC LIMIT ?, ?`, req.Uid, req.Seq, req.Num)
 	if err == sql.ErrNoRows {
-		log.Printf("no more data for uid:%d seq:%d", req.Uid, req.Seq)
+		log.Printf("GetRecords no more data for uid:%d seq:%d", req.Uid, req.Seq)
 		return nil
 	} else if err != nil {
 		log.Printf("GetRecords query failed:%v", err)
@@ -42,6 +42,34 @@ func (s *Server) GetRecords(ctx context.Context, req *order.GetRequest,
 			continue
 		}
 		infos = append(infos, &rec)
+	}
+	rsp.Infos = infos
+	return nil
+}
+
+//GetRecharges get recharge records
+func (s *Server) GetRecharges(ctx context.Context, req *order.GetRequest,
+	rsp *order.RechargesResponse) error {
+	rows, err := db.Query(`SELECT id, oid, depict, price, ctime, status FROM 
+	orders WHERE owner = ? AND type = 1 AND id < ? ORDER BY id DESC LIMIT ?`,
+		req.Uid, req.Seq, req.Num)
+	if err == sql.ErrNoRows {
+		log.Printf("GetRecharges no more data for uid:%d seq:%d", req.Uid, req.Seq)
+		return nil
+	} else if err != nil {
+		log.Printf("GetRecharges query failed:%v", err)
+		return err
+	}
+	defer rows.Close()
+	var infos []*order.Recharge
+	for rows.Next() {
+		var info order.Recharge
+		err = rows.Scan(&info.Id, &info.Oid, &info.Depict, &info.Price,
+			&info.Ctime, &info.Status)
+		if err != nil {
+			continue
+		}
+		infos = append(infos, &info)
 	}
 	rsp.Infos = infos
 	return nil
