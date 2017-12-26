@@ -8,6 +8,8 @@ const (
 	signMethod      = "HMAC-SHA1"
 	signVersion     = "1.0"
 	domain          = "live.yunxingzh.com"
-	host            = "https://live.aliyuncs.com"
+	vhost           = "east-live.yunxingzh.com"
 	appname         = "apptest"
+	pushHost        = "rtmp://video-center.alivecdn.com"
+	apiHost         = "https://live.aliyuncs.com"
 )

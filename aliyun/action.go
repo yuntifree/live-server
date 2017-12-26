@@ -11,6 +11,59 @@ import (
 	"github.com/yuntifree/components/strutil"
 )
 
+//GenAuthKey generate auth key
+func GenAuthKey(uri, key string, timestamp, rand, uid int64) string {
+	str := fmt.Sprintf("%s-%d-%d-%d-%s", uri, timestamp, rand,
+		uid, key)
+	return strutil.MD5(str)
+}
+
+//GenPushURL generate push url
+func GenPushURL(name string, uid int64) string {
+	stream := genAuthStream(name, uid)
+	return fmt.Sprintf("%s/%s/%s", pushHost, appname, stream)
+}
+
+func genAuthStream(name string, uid int64) string {
+	uri := "/" + appname + "/" + name
+	ts := time.Now().Unix() + 3600
+	auth := GenAuthKey(uri, accessKeySecret, ts, 0, uid)
+	return fmt.Sprintf("%s?vhost=%s&auth_key=%d-0-%d-%s",
+		name, vhost, ts, uid, auth)
+}
+
+func getResolutionID(resolution int64) string {
+	var id string
+	switch resolution {
+	case 0:
+		id = "lld"
+	case 1:
+		id = "lsd"
+	case 2:
+		id = "lhd"
+	case 3:
+		id = "lud"
+	}
+	return id
+}
+
+//GenLiveHLS generate live hls url
+func GenLiveHLS(name string) string {
+	return fmt.Sprintf("http://%s/%s.m3u8", vhost, name)
+}
+
+//GenLiveRTMP generate live rtmp
+func GenLiveRTMP(name string, resolution int64) string {
+	id := getResolutionID(resolution)
+	return fmt.Sprintf("rtmp://%s/%s_%s", vhost, name, id)
+}
+
+//GenLiveFLV generate live flv
+func GenLiveFLV(name string, resolution int64) string {
+	id := getResolutionID(resolution)
+	return fmt.Sprintf("http://%s/%s_%s.flv", vhost, name, id)
+}
+
 func genSign(m map[string]string, key string) string {
 	var sortedKeys []string
 	for k := range m {
@@ -71,7 +124,7 @@ func DescribeLiveStreamPublishList(startTime, endTime string) string {
 	m["EndTime"] = endTime
 	sign := genSign(m, accessKeySecret)
 	query := toString(m)
-	url := host + "?" + query + "Signature=" + sign
+	url := apiHost + "?" + query + "Signature=" + sign
 	rsp, err := httputil.Request(url, "")
 	if err != nil {
 		log.Printf("DescribeLiveStreamPublishList failed:%s %v", url, err)
@@ -87,7 +140,7 @@ func DescribeLiveStreamOnlineUserNum() string {
 	m["DomainName"] = domain
 	sign := genSign(m, accessKeySecret)
 	query := toString(m)
-	url := host + "?" + query + "Signature=" + sign
+	url := apiHost + "?" + query + "Signature=" + sign
 	rsp, err := httputil.Request(url, "")
 	if err != nil {
 		log.Printf("DescribeLiveStreamOnlineUserNum failed:%s %v", url, err)
@@ -106,7 +159,7 @@ func ForbidLiveStream(stream string) string {
 	m["LiveStreamType"] = "publisher"
 	sign := genSign(m, accessKeySecret)
 	query := toString(m)
-	url := host + "?" + query + "Signature=" + sign
+	url := apiHost + "?" + query + "Signature=" + sign
 	rsp, err := httputil.Request(url, "")
 	if err != nil {
 		log.Printf("ForbidLiveStream failed:%s %v", url, err)
@@ -125,7 +178,7 @@ func ResumeLiveStream(stream string) string {
 	m["LiveStreamType"] = "publisher"
 	sign := genSign(m, accessKeySecret)
 	query := toString(m)
-	url := host + "?" + query + "Signature=" + sign
+	url := apiHost + "?" + query + "Signature=" + sign
 	rsp, err := httputil.Request(url, "")
 	if err != nil {
 		log.Printf("ResumeLiveStream failed:%s %v", url, err)
@@ -141,7 +194,7 @@ func DescribeLiveStreamsFrameRateAndBitRateData() string {
 	m["DomainName"] = domain
 	sign := genSign(m, accessKeySecret)
 	query := toString(m)
-	url := host + "?" + query + "Signature=" + sign
+	url := apiHost + "?" + query + "Signature=" + sign
 	rsp, err := httputil.Request(url, "")
 	if err != nil {
 		log.Printf("ResumeLiveStream failed:%s %v", url, err)
