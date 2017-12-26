@@ -13,7 +13,6 @@ import (
 
 func main() {
 	router := gin.Default()
-	router.GET("/stream/:action", streamHandler)
 	router.POST("/user/:action", userHandler)
 	router.POST("/withdraw/:action", withdrawHandler)
 	router.POST("/order/:action", orderHandler)
