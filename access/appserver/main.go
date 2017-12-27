@@ -34,7 +34,7 @@ func main() {
 	router.POST("/withdraw/:action", withdrawHandler)
 	router.POST("/order/:action", orderHandler)
 	router.POST("/live/:action", liveHandler)
-	router.POST("/image/:action", userHandler)
+	router.POST("/image/:action", imageHandler)
 	router.POST("/wxpay/scan_callback", scanHandler)
 
 	srv := &http.Server{
