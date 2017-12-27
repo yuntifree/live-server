@@ -4,6 +4,40 @@ package live;
 
 service Live {
     rpc Create(CreateRequest) returns (CreateResponse) {}
+    rpc Stop(StopRequest) returns (StopResponse) {}
+    rpc GetRecords(GetRequest) returns (RecordResponse) {}
+}
+
+message GetRequest {
+    int64 uid = 1;
+    int64 seq = 2;
+    int64 num = 3;
+}
+
+message Record {
+    int64 id = 1;
+    string title = 2;
+    string cover = 3;
+    string depict = 4;
+    string ctime = 5;
+    string ftime = 6;
+    int64 authority = 7;
+    string passwd = 8;
+    int64 price = 9;
+    int64 status = 10;
+    string replay = 11;
+}
+
+message RecordResponse {
+    repeated Record infos = 1;
+}
+
+message StopRequest {
+    int64 uid = 1;
+    int64 id = 2;
+}
+
+message StopResponse {
 }
 
 message CreateRequest {

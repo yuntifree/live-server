@@ -9,9 +9,11 @@ CREATE TABLE IF NOT EXISTS users
     phone   varchar(16) NOT NULL DEFAULT '',
     headurl     varchar(256) NOT NULL DEFAULT '',
     nickname    varchar(64) NOT NULL DEFAULT '', 
-    -- role 0:普通用户 
+    -- role 0:普通用户 1:VIP用户
     role        tinyint unsigned NOT NULL DEFAULT 0,
     ctime   datetime NOT NULL DEFAULT '2017-12-01',
+    stime   datetime NOT NULL DEFAULT '2017-12-01',
+    etime   datetime NOT NULL DEFAULT '2017-12-01',
     PRIMARY KEY(uid),
     UNIQUE KEY(name)
 ) ENGINE = InnoDB;
@@ -24,6 +26,7 @@ CREATE TABLE IF NOT EXISTS user_info
     apply   int unsigned NOT NULL DEFAULT 0,
     withdraw    int unsigned NOT NULL DEFAULT 0,
     recharge    int unsigned NOT NULL DEFAULT 0,
+    expense     int unsigned NOT NULL DEFAULT 0,
     PRIMARY KEY(id),
     UNIQUE KEY(uid)
 ) ENGINE = InnoDB;
@@ -48,6 +51,7 @@ CREATE TABLE IF NOT EXISTS stream
     uid     int unsigned NOT NULL DEFAULT 0,
     -- status 0:创建 1-推流
     status  tinyint unsigned NOT NULL DEFAULT 0,
+    cur_id  int unsigned NOT NULL DEFAULT 0,
     PRIMARY KEY(id),
     UNIQUE KEY(name),
     KEY(uid)
@@ -66,7 +70,9 @@ CREATE TABLE IF NOT EXISTS live_history
     price   int unsigned NOT NULL DEFAULT 0,
     resolution tinyint unsigned NOT NULL DEFAULT 0,
     push    varchar(256) NOT NULL DEFAULT '',
+    replay  varchar(256) NOT NULL DEFAULT '',
     ctime   datetime NOT NULL DEFAULT '2017-12-01',
+    ftime   datetime NOT NULL DEFAULT '2017-12-01',
     PRIMARY KEY(id),
     KEY(uid)
 ) ENGINE = InnoDB;

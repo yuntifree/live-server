@@ -66,12 +66,57 @@ func (s *Server) Create(ctx context.Context, req *live.CreateRequest,
 	return nil
 }
 
-func genAuthStream(name, host, key string, uid int64) string {
-	uri := "/live/" + name
-	ts := time.Now().Unix() + 3600
-	auth := aliyun.GenAuthKey(uri, key, ts, 0, uid)
-	return fmt.Sprintf("%s?vhost=%s&auth_key=%d-0-%d-%s",
-		name, host, ts, uid, auth)
+//Stop stop live stream
+func (s *Server) Stop(ctx context.Context, req *live.StopRequest,
+	rsp *live.StopResponse) error {
+	var uid int64
+	err := db.QueryRow(`SELECT uid FROM live_history WHERE id = ?`, req.Id).
+		Scan(&uid)
+	if err != nil {
+		log.Printf("Stop query uid failed:%d %v", req.Id, err)
+		return err
+	}
+	if req.Uid != uid {
+		log.Printf("Stop uid not matched:%d %d", req.Uid, uid)
+		return fmt.Errorf("not matched owner uid")
+	}
+	_, err = db.Exec(`UPDATE live_history SET ftime = NOW(), status = 2 
+	WHERE id = ?`, req.Id)
+	if err != nil {
+		log.Printf("Stop update history failed:%d %v", req.Id, err)
+		return err
+	}
+	return nil
+}
+
+//GetRecords get live records
+func (s *Server) GetRecords(ctx context.Context, req *live.GetRequest,
+	rsp *live.RecordResponse) error {
+	rows, err := db.Query(`SELECT id, title, cover, depict, ctime, ftime, 
+	authority, passwd, price, status, replay FROM live_history WHERE uid = ?
+	AND id < ? ORDER BY id DESC LIMIT ?`, req.Uid, req.Seq, req.Num)
+	if err == sql.ErrNoRows {
+		log.Printf("GetRecords no data:%d %d", req.Uid, req.Seq)
+		return nil
+	} else if err != nil {
+		log.Printf("GetRecords query failed:%d %d %v", req.Uid, req.Seq, err)
+		return err
+	}
+	defer rows.Close()
+	var infos []*live.Record
+	for rows.Next() {
+		var info live.Record
+		err = rows.Scan(&info.Id, &info.Title, &info.Cover, &info.Depict,
+			&info.Ctime, &info.Ftime, &info.Authority, &info.Passwd,
+			&info.Price, &info.Status, &info.Replay)
+		if err != nil {
+			log.Printf("GetRecords scan failed:%v", err)
+			continue
+		}
+		infos = append(infos, &info)
+	}
+	rsp.Infos = infos
+	return nil
 }
 
 func main() {

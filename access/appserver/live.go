@@ -16,6 +16,10 @@ func liveHandler(c *gin.Context) {
 	switch action {
 	case "create":
 		createLive(c)
+	case "stop":
+		stopLive(c)
+	case "records":
+		getLiveRecords(c)
 	default:
 		c.JSON(http.StatusOK, gin.H{"errno": 101, "desc": "unknown action"})
 	}
@@ -37,4 +41,36 @@ func createLive(c *gin.Context) {
 	log.Printf("rsp:%+v", rsp)
 	c.JSON(http.StatusOK, gin.H{"errno": 0, "push": rsp.Push,
 		"rtmp": rsp.Rtmp, "flv": rsp.Flv, "hls": rsp.Hls})
+}
+
+func stopLive(c *gin.Context) {
+	var req live.StopRequest
+	if err := c.BindJSON(&req); err != nil {
+		c.JSON(http.StatusOK, gin.H{"errno": 102, "desc": "illegal param"})
+		return
+	}
+	cl := live.NewLiveClient(accounts.LiveService, client.DefaultClient)
+	rsp, err := cl.Stop(context.Background(), &req)
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{"errno": 1, "desc": err.Error()})
+		return
+	}
+	log.Printf("rsp:%+v", rsp)
+	c.JSON(http.StatusOK, gin.H{"errno": 0})
+}
+
+func getLiveRecords(c *gin.Context) {
+	var req live.GetRequest
+	if err := c.BindJSON(&req); err != nil {
+		c.JSON(http.StatusOK, gin.H{"errno": 102, "desc": "illegal param"})
+		return
+	}
+	cl := live.NewLiveClient(accounts.LiveService, client.DefaultClient)
+	rsp, err := cl.GetRecords(context.Background(), &req)
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{"errno": 1, "desc": err.Error()})
+		return
+	}
+	log.Printf("rsp:%+v", rsp)
+	c.JSON(http.StatusOK, gin.H{"errno": 0, "infos": rsp.Infos})
 }
