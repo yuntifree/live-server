@@ -11,4 +11,6 @@ const (
 	OrderService = "go.micro.live.order"
 	//LiveService live service name
 	LiveService = "go.micro.live.live"
+	//ImageService image service name
+	ImageService = "go.micro.live.image"
 )

@@ -108,3 +108,19 @@ CREATE TABLE IF NOT EXISTS pay_items
     ctime   datetime NOT NULL DEFAULT '2017-12-01',
     PRIMARY KEY(id)
 ) ENGINE = InnoDB;
+
+CREATE TABLE IF NOT EXISTS image
+(
+    id     bigint unsigned NOT NULL AUTO_INCREMENT,
+    name    varchar(48) NOT NULL,
+    uid     int unsigned NOT NULL,
+    filesize    int unsigned NOT NULL,
+    height      int unsigned NOT NULL,
+    width       int unsigned NOT NULL,
+    status      tinyint unsigned NOT NULL default 0,
+    deleted     tinyint unsigned NOT NULL default 0,
+    ctime       datetime NOT NULL default '0000-00-00 00:00:00',
+    ftime       datetime NOT NULL default '0000-00-00 00:00:00',
+    PRIMARY KEY(id),
+    UNIQUE KEY(name)
+) ENGINE = InnoDB;
