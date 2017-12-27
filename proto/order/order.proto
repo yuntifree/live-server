@@ -5,12 +5,24 @@ package order;
 service Order {
     rpc GetRecords(GetRequest) returns (RecordsResponse) {}
     rpc GetRecharges(GetRequest) returns (RechargesResponse) {}
+    rpc GetItems(GetRequest) returns (ItemsResponse) {}
 }
 
 message GetRequest {
     int64 seq = 1;
     int64 num = 2;
     int64 uid = 3;
+}
+
+message Item {
+    int64 id = 1;
+    int64 price = 2;
+    string qrcode = 3;
+    string img = 4;
+}
+
+message ItemsResponse {
+    repeated Item infos = 1;
 }
 
 message Record {

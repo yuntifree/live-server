@@ -4,6 +4,23 @@ package user;
 
 service User {
     rpc Login(LoginRequest) returns (LoginResponse) {}
+    rpc Info(InfoRequest) returns (InfoResponse) {}
+}
+
+message InfoRequest {
+    int64 uid = 1;
+}
+
+message InfoResponse {
+    string username = 1;
+    string nickname = 2;
+    string headurl = 3;
+    int64 role = 4;
+    string ctime = 5;
+    string start = 6;
+    string end = 7;
+    int64 income = 8;
+    int64 expense = 9;
 }
 
 message LoginRequest {

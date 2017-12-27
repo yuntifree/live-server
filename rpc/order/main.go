@@ -10,6 +10,7 @@ import (
 
 	micro "github.com/micro/go-micro"
 	"github.com/yuntifree/components/dbutil"
+	"github.com/yuntifree/components/weixin"
 	"github.com/yuntifree/live-server/accounts"
 	"github.com/yuntifree/live-server/proto/order"
 )
@@ -70,6 +71,34 @@ func (s *Server) GetRecharges(ctx context.Context, req *order.GetRequest,
 			continue
 		}
 		infos = append(infos, &info)
+	}
+	rsp.Infos = infos
+	return nil
+}
+
+//GetItems get pay items
+func (s *Server) GetItems(ctx context.Context, req *order.GetRequest,
+	rsp *order.ItemsResponse) error {
+	rows, err := db.Query(`SELECT id, price, product, img FROM pay_items
+	WHERE deleted = 0 AND online = 1`)
+	if err != nil {
+		log.Printf("GetItems query failed:%v", err)
+		return err
+	}
+	defer rows.Close()
+	var infos []*order.Item
+	wx := weixin.WxPay{MerID: accounts.WxMerID,
+		MerKey: accounts.WxMerKey, Appid: accounts.DgWxAppid}
+	for rows.Next() {
+		var item order.Item
+		var product string
+		err = rows.Scan(&item.Id, &item.Price, &product,
+			&item.Img)
+		if err != nil {
+			continue
+		}
+		item.Qrcode = wx.GenQRCode(product)
+		infos = append(infos, &item)
 	}
 	rsp.Infos = infos
 	return nil

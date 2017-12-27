@@ -48,6 +48,21 @@ func (s *Server) Login(ctx context.Context, req *user.LoginRequest,
 	return nil
 }
 
+//Info get user info
+func (s *Server) Info(ctx context.Context, req *user.InfoRequest,
+	rsp *user.InfoResponse) error {
+	err := db.QueryRow(`SELECT name, nickname, headurl, role, ctime, 
+	stime, etime, income, expense FROM users u, user_info i WHERE 
+	u.uid = i.uid AND u.uid = ?`, req.Uid).Scan(&rsp.Username, &rsp.Nickname,
+		&rsp.Headurl, &rsp.Role, &rsp.Ctime, &rsp.Start, &rsp.End,
+		&rsp.Income, &rsp.Expense)
+	if err != nil {
+		log.Printf("Info query failed:%d %v", req.Uid, err)
+		return err
+	}
+	return nil
+}
+
 func main() {
 	var err error
 	db, err = dbutil.NewDB(accounts.DbDsn)

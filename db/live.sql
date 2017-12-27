@@ -96,3 +96,15 @@ CREATE TABLE IF NOT EXISTS orders
     KEY(uid),
     KEY(owner)
 ) ENGINE = InnoDB;
+
+CREATE TABLE IF NOT EXISTS pay_items
+(
+    id      int unsigned NOT NULL AUTO_INCREMENT,
+    price   int unsigned NOT NULL DEFAULT 0,
+    product varchar(64) NOT NULL DEFAULT '',
+    img     varchar(128) NOT NULL DEFAULT '',
+    online  tinyint unsigned NOT NULL DEFAULT 0,
+    deleted tinyint unsigned NOT NULL DEFAULT 0,
+    ctime   datetime NOT NULL DEFAULT '2017-12-01',
+    PRIMARY KEY(id)
+) ENGINE = InnoDB;
