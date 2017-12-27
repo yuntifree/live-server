@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+package pay;
+
+service Pay {
+    rpc Add(AddRequest) returns (AddResponse) {}
+}
+
+message AddRequest {
+    string appid = 1;
+    string merid = 2;
+    int64 uid = 3;
+    int64 item = 4;
+    string openid = 5;
+    string clientip = 6;
+}
+
+message AddResponse {
+    string appid = 1;
+    string merid = 2;
+    string nonce = 3;
+    string prepayid = 4;
+}
+

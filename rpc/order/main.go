@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	"fmt"
 	"log"
 	"time"
 
@@ -79,7 +80,7 @@ func (s *Server) GetRecharges(ctx context.Context, req *order.GetRequest,
 //GetItems get pay items
 func (s *Server) GetItems(ctx context.Context, req *order.GetRequest,
 	rsp *order.ItemsResponse) error {
-	rows, err := db.Query(`SELECT id, price, product, img FROM pay_items
+	rows, err := db.Query(`SELECT id, price, img FROM pay_items
 	WHERE deleted = 0 AND online = 1`)
 	if err != nil {
 		log.Printf("GetItems query failed:%v", err)
@@ -91,12 +92,12 @@ func (s *Server) GetItems(ctx context.Context, req *order.GetRequest,
 		MerKey: accounts.WxMerKey, Appid: accounts.DgWxAppid}
 	for rows.Next() {
 		var item order.Item
-		var product string
-		err = rows.Scan(&item.Id, &item.Price, &product,
+		err = rows.Scan(&item.Id, &item.Price,
 			&item.Img)
 		if err != nil {
 			continue
 		}
+		product := fmt.Sprintf("%d-%d", req.Uid, item.Id)
 		item.Qrcode = wx.GenQRCode(product)
 		infos = append(infos, &item)
 	}

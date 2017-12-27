@@ -84,7 +84,7 @@ CREATE TABLE IF NOT EXISTS orders
     uid int unsigned NOT NULL,
     -- type 0:支付视频  1-充值
     type    tinyint unsigned NOT NULL DEFAULT 0,
-    owner int unsigned NOT NULL,
+    owner int unsigned NOT NULL DEFAULT 0,
     hid   int unsigned NOT NULL,
     price int unsigned NOT NULL DEFAULT 0,
     fee   int unsigned NOT NULL DEFAULT 0,

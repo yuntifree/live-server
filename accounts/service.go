@@ -13,4 +13,6 @@ const (
 	LiveService = "go.micro.live.live"
 	//ImageService image service name
 	ImageService = "go.micro.live.image"
+	//PayService pay service name
+	PayService = "go.micro.live.pay"
 )

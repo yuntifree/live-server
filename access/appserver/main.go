@@ -1,10 +1,7 @@
 package main
 
 import (
-	"bytes"
 	"context"
-	"encoding/xml"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -12,21 +9,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/yuntifree/components/weixin"
 )
-
-func scanHandler(c *gin.Context) {
-	log.Printf("url:%+v", c.Request)
-	buf, err := ioutil.ReadAll(c.Request.Body)
-	if err != nil {
-		log.Printf("Read body failed:%v", err)
-	}
-	log.Printf("body:%s", string(buf))
-	var req weixin.ScanReq
-	dec := xml.NewDecoder(bytes.NewReader(buf))
-	err = dec.Decode(&req)
-	log.Printf("req:%+v", req)
-}
 
 func main() {
 	router := gin.Default()
@@ -35,7 +18,7 @@ func main() {
 	router.POST("/order/:action", orderHandler)
 	router.POST("/live/:action", liveHandler)
 	router.POST("/image/:action", imageHandler)
-	router.POST("/wxpay/scan_callback", scanHandler)
+	router.POST("/wxpay/:action", wxpayHandler)
 
 	srv := &http.Server{
 		Addr:    ":9898",
