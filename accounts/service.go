@@ -17,4 +17,6 @@ const (
 	PayService = "go.micro.live.pay"
 	//ChannelService channel service name
 	ChannelService = "go.micro.live.channel"
+	//FeedbackService feedback service name
+	FeedbackService = "go.micro.live.feedback"
 )

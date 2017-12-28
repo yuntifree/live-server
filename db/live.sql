@@ -169,3 +169,13 @@ CREATE TABLE IF NOT EXISTS tags
     KEY(uid)
 ) ENGINE = InnoDB;
 
+CREATE TABLE IF NOT EXISTS feedback
+(
+    id      bigint unsigned NOT NULL AUTO_INCREMENT,
+    uid     int unsigned NOT NULL,
+    title   varchar(128) NOT NULL DEFAULT '',
+    content varchar(512) NOT NULL DEFAULT '',
+    ctime   datetime NOT NULL DEFAULT '2017-12-01',
+    PRIMARY KEY(id),
+    KEY(uid)
+) ENGINE = InnoDB;
