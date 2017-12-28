@@ -19,6 +19,7 @@ func main() {
 	router.POST("/live/:action", liveHandler)
 	router.POST("/image/:action", imageHandler)
 	router.POST("/wxpay/:action", wxpayHandler)
+	router.POST("/channel/:action", channelHandler)
 
 	srv := &http.Server{
 		Addr:    ":9898",

@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
+	"strconv"
 	"time"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -24,9 +25,18 @@ type Server struct{}
 //GetRecords get withdraw records
 func (s *Server) GetRecords(ctx context.Context, req *order.GetRequest,
 	rsp *order.RecordsResponse) error {
-	rows, err := db.Query(`SELECT o.id, o.hid, u.headurl, u.nickname, o.depict, o.price,
-	o.uid FROM orders o, users u WHERE o.uid = u.uid AND o.owner = ? AND type = 0 
-	AND status = 1 ORDER BY id DESC LIMIT ?, ?`, req.Uid, req.Seq, req.Num)
+	query := `SELECT o.id, o.hid, u.headurl, u.nickname, o.depict, o.price,
+	o.uid FROM orders o, users u WHERE o.uid = u.uid AND type = 0 AND 
+	status = 1`
+	if req.Search != "" {
+		id, err := strconv.Atoi(req.Search)
+		if err == nil {
+			query += fmt.Sprintf(" AND o.hid = %d", id)
+		}
+	}
+	query += fmt.Sprintf(" AND o.owner = %d ORDER BY id DESC LIMIT %d, %d",
+		req.Uid, req.Seq, req.Num)
+	rows, err := db.Query(query)
 	if err == sql.ErrNoRows {
 		log.Printf("GetRecords no more data for uid:%d seq:%d", req.Uid, req.Seq)
 		return nil
@@ -53,7 +63,7 @@ func (s *Server) GetRecords(ctx context.Context, req *order.GetRequest,
 func (s *Server) GetRecharges(ctx context.Context, req *order.GetRequest,
 	rsp *order.RechargesResponse) error {
 	rows, err := db.Query(`SELECT id, oid, depict, price, ctime, status FROM 
-	orders WHERE owner = ? AND type = 1 AND id < ? ORDER BY id DESC LIMIT ?`,
+	orders WHERE uid = ? AND type = 1 LIMIT ?, ?`,
 		req.Uid, req.Seq, req.Num)
 	if err == sql.ErrNoRows {
 		log.Printf("GetRecharges no more data for uid:%d seq:%d", req.Uid, req.Seq)
@@ -98,6 +108,7 @@ func (s *Server) GetItems(ctx context.Context, req *order.GetRequest,
 			continue
 		}
 		product := fmt.Sprintf("%d-%d", req.Uid, item.Id)
+		log.Printf("product:%s", product)
 		item.Qrcode = wx.GenQRCode(product)
 		infos = append(infos, &item)
 	}

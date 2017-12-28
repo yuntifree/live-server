@@ -124,3 +124,48 @@ CREATE TABLE IF NOT EXISTS image
     PRIMARY KEY(id),
     UNIQUE KEY(name)
 ) ENGINE = InnoDB;
+
+CREATE TABLE IF NOT EXISTS channel
+(
+    id      int unsigned NOT NULL AUTO_INCREMENT,
+    uid     int unsigned NOT NULL,
+    -- 频道名称
+    title   varchar(128) NOT NULL DEFAULT '',
+    -- 频道轮播图
+    cover1  varchar(128) NOT NULL DEFAULT '',
+    cover2  varchar(128) NOT NULL DEFAULT '',
+    cover3  varchar(128) NOT NULL DEFAULT '',
+    -- 公众号二维码
+    qrcode  varchar(128) NOT NULL DEFAULT '',
+    -- 直播简介
+    depict  varchar(256) NOT NULL DEFAULT '',
+    -- 频道介绍
+    chan_intro  varchar(128) NOT NULL DEFAULT '',
+    -- 直播介绍
+    live_intro  varchar(128) NOT NULL DEFAULT '',
+    -- 企业公众号
+    wxmp        varchar(128) NOT NULL DEFAULT '',
+    -- 是否显示频道简介
+    display     tinyint unsigned NOT NULL DEFAULT 0, 
+    -- 频道地址
+    dst         varchar(128) NOT NULL DEFAULT '',
+    -- 附加功能
+    extra       tinyint unsigned NOT NULL DEFAULT 0,
+    ctime   datetime NOT NULL DEFAULT '2017-12-01',
+    PRIMARY KEY(id),
+    UNIQUE KEY(uid)
+) ENGINE = InnoDB;
+
+CREATE TABLE IF NOT EXISTS tags
+(
+    id      bigint unsigned NOT NULL AUTO_INCREMENT,
+    uid     int unsigned NOT NULL,
+    content varchar(128) NOT NULL DEFAULT '',
+    priority    int unsigned NOT NULL DEFAULT 0,
+    online  tinyint unsigned NOT NULL DEFAULT 0,
+    deleted tinyint unsigned NOT NULL DEFAULT 0,
+    ctime   datetime NOT NULL DEFAULT '2017-12-01',
+    PRIMARY KEY(id),
+    KEY(uid)
+) ENGINE = InnoDB;
+

@@ -79,7 +79,7 @@ func (s *Server) Add(ctx context.Context, req *pay.AddRequest,
 
 func recordOrderInfo(db *sql.DB, oid string, price int64, req *pay.AddRequest) (int64, error) {
 	res, err := db.Exec(`INSERT INTO orders(type, oid, uid, item, price, ctime)
-	VALUES (0, ?, ?, ?, ?, NOW())`, oid, req.Uid, req.Item, price)
+	VALUES (1, ?, ?, ?, ?, NOW())`, oid, req.Uid, req.Item, price)
 	if err != nil {
 		return 0, err
 	}
@@ -118,7 +118,7 @@ func (s *Server) Fin(ctx context.Context, req *pay.FinRequest,
 		log.Printf("Fin illegal fee, oid:%s %d-%d", req.Oid, price, req.Fee)
 		return fmt.Errorf("illegal feed oid:%s %d-%d", req.Oid, price, req.Fee)
 	}
-	_, err = db.Exec(`UPDATE orders SET status = 1, fee = ?, ftime = NOW() 
+	_, err = db.Exec(`UPDATE orders SET status = 1, fee = ?, ptime = NOW() 
 	WHERE id = ?`, req.Fee, id)
 	if err != nil {
 		log.Printf("Fin update order info failed, oid:%s fee:%d %v", req.Oid,
