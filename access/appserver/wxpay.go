@@ -17,11 +17,19 @@ import (
 	"github.com/yuntifree/live-server/proto/pay"
 )
 
+const (
+	succRsp  = "<xml><return_code><![CDATA[SUCCESS]]></return_code><return_msg><![CDATA[OK]]></return_msg></xml>"
+	failRsp  = "<xml><return_code><![CDATA[FAIL]]></return_code><return_msg><![CDATA[SERVER ERROR]]></return_msg></xml>"
+	succCode = "SUCCESS"
+)
+
 func wxpayHandler(c *gin.Context) {
 	action := c.Param("action")
 	switch action {
 	case "scan_callback":
 		scanHandle(c)
+	case "callback":
+		paySuccHandle(c)
 	default:
 		c.JSON(http.StatusOK, gin.H{"errno": 101, "desc": "unknown action"})
 	}
@@ -85,4 +93,44 @@ func parseProduct(product string) (int64, int64) {
 		panic("parseProduct failed:" + err.Error())
 	}
 	return int64(uid), int64(item)
+}
+
+func paySuccHandle(c *gin.Context) {
+	buf, err := ioutil.ReadAll(c.Request.Body)
+	if err != nil {
+		log.Printf("paySuccHandle read body failed:%v", err)
+		c.Data(http.StatusOK, "application/xml", []byte(failRsp))
+		return
+	}
+	var notify weixin.NotifyRequest
+	err = xml.Unmarshal(buf, &notify)
+	if err != nil {
+		log.Printf("paySuccHandle Unmarshal xml failed:%v", err)
+		c.Data(http.StatusOK, "application/xml", []byte(failRsp))
+		return
+	}
+	if notify.ReturnCode != succCode || notify.ResultCode != succCode {
+		log.Printf("paySuccHandle failed response:%+v", notify)
+		c.Data(http.StatusOK, "application/xml", []byte(succRsp))
+		return
+	}
+
+	wx := weixin.WxPay{MerID: accounts.WxMerID,
+		MerKey: accounts.WxMerKey}
+	if !wx.VerifyNotify(notify) {
+		log.Printf("paySuccHandle VerifyNotify failed:%+v", notify)
+		c.Data(http.StatusOK, "application/xml", []byte(failRsp))
+		return
+	}
+
+	c.Data(http.StatusOK, "application/xml", []byte(succRsp))
+	var req pay.FinRequest
+	req.Oid = notify.OutTradeNO
+	req.Fee = notify.TotalFee
+	cl := pay.NewPayClient(accounts.PayService, client.DefaultClient)
+	_, err = cl.Fin(context.Background(), &req)
+	if err != nil {
+		log.Printf("paySuccHandle Finish failed:%s %v", req.Oid, err)
+		return
+	}
 }

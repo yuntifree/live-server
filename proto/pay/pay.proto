@@ -4,6 +4,15 @@ package pay;
 
 service Pay {
     rpc Add(AddRequest) returns (AddResponse) {}
+    rpc Fin(FinRequest) returns (FinResponse) {}
+}
+
+message FinRequest {
+    string oid = 1;
+    int64 fee = 2;
+}
+
+message FinResponse {
 }
 
 message AddRequest {

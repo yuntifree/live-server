@@ -95,6 +95,48 @@ func recordPrepayid(db *sql.DB, id int64, prepayid string) {
 	}
 }
 
+//Fin pay finished
+func (s *Server) Fin(ctx context.Context, req *pay.FinRequest,
+	rsp *pay.FinResponse) error {
+	log.Printf("Fin request:%+v", req)
+	var id, item, uid, price, status, typ int64
+	var prepayid string
+	err := db.QueryRow(`SELECT id, item, uid, price, type, status, prepayid
+	FROM orders WHERE oid = ?`, req.Oid).
+		Scan(&id, &item, &uid, &price, &typ, &status, &prepayid)
+	if err != nil {
+		log.Printf("Fin query order info failed:%s %v", req.Oid, err)
+		return err
+	}
+	log.Printf("id:%d item:%d price:%d status:%d prepayid:%s", id,
+		item, price, status, prepayid)
+	if status == 1 {
+		log.Printf("Fin has duplicated oid:%s", req.Oid)
+		return nil
+	}
+	if price > req.Fee {
+		log.Printf("Fin illegal fee, oid:%s %d-%d", req.Oid, price, req.Fee)
+		return fmt.Errorf("illegal feed oid:%s %d-%d", req.Oid, price, req.Fee)
+	}
+	_, err = db.Exec(`UPDATE orders SET status = 1, fee = ?, ftime = NOW() 
+	WHERE id = ?`, req.Fee, id)
+	if err != nil {
+		log.Printf("Fin update order info failed, oid:%s fee:%d %v", req.Oid,
+			req.Fee, err)
+		return fmt.Errorf("update order info failed, oid:%s fee:%d %v", req.Oid,
+			req.Fee, err)
+	}
+
+	log.Printf("after update orders status:%s", req.Oid)
+	_, err = db.Exec(`UPDATE user_info SET recharge = recharge + ? WHERE uid = ?`,
+		req.Fee, uid)
+	if err != nil {
+		log.Printf("update user recharge failed:%d %v", uid, err)
+	}
+
+	return nil
+}
+
 func main() {
 	var err error
 	db, err = dbutil.NewDB(accounts.DbDsn)
