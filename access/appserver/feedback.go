@@ -16,6 +16,8 @@ func feedbackHandler(c *gin.Context) {
 	switch action {
 	case "add":
 		addFeedback(c)
+	case "records":
+		getFeedbackRecords(c)
 	default:
 		c.JSON(http.StatusOK, gin.H{"errno": 101, "desc": "unknown action"})
 	}
@@ -38,4 +40,20 @@ func addFeedback(c *gin.Context) {
 	}
 	log.Printf("rsp:%+v", rsp)
 	c.JSON(http.StatusOK, gin.H{"errno": 0, "id": rsp.Id})
+}
+
+func getFeedbackRecords(c *gin.Context) {
+	var req feedback.GetRequest
+	if err := c.BindJSON(&req); err != nil {
+		c.JSON(http.StatusOK, gin.H{"errno": 102, "desc": "illegal param"})
+		return
+	}
+	cl := feedback.NewFeedbackClient(accounts.FeedbackService, client.DefaultClient)
+	rsp, err := cl.GetRecords(context.Background(), &req)
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{"errno": 1, "desc": err.Error()})
+		return
+	}
+	log.Printf("rsp:%+v", rsp)
+	c.JSON(http.StatusOK, gin.H{"errno": 0, "infos": rsp.Infos})
 }

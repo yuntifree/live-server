@@ -37,6 +37,30 @@ func (s *Server) Add(ctx context.Context, req *feedback.AddRequest,
 	return nil
 }
 
+//GetRecords get feedback records
+func (s *Server) GetRecords(ctx context.Context, req *feedback.GetRequest,
+	rsp *feedback.RecordsResponse) error {
+	rows, err := db.Query(`SELECT id, title, content FROM feedback 
+	WHERE uid = ? ORDER BY id DESC LIMIT ?, ?`, req.Uid,
+		req.Seq, req.Num)
+	if err != nil {
+		log.Printf("GetRecords query failed:%v", err)
+		return err
+	}
+	defer rows.Close()
+	var infos []*feedback.Info
+	for rows.Next() {
+		var info feedback.Info
+		err = rows.Scan(&info.Id, &info.Title, &info.Content)
+		if err != nil {
+			continue
+		}
+		infos = append(infos, &info)
+	}
+	rsp.Infos = infos
+	return nil
+}
+
 func main() {
 	var err error
 	db, err = dbutil.NewDB(accounts.DbDsn)

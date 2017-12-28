@@ -4,6 +4,17 @@ package feedback;
 
 service Feedback {
     rpc Add(AddRequest) returns (AddResponse) {}
+    rpc GetRecords(GetRequest) returns (RecordsResponse) {}
+}
+
+message GetRequest {
+    int64 uid = 1;
+    int64 seq = 2;
+    int64 num = 3;
+}
+
+message RecordsResponse {
+    repeated Info infos = 1;
 }
 
 message Info {
