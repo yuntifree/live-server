@@ -5,6 +5,16 @@ package user;
 service User {
     rpc Login(LoginRequest) returns (LoginResponse) {}
     rpc Info(InfoRequest) returns (InfoResponse) {}
+    rpc UpdatePasswd(PasswdRequest) returns (PasswdResponse) {}
+}
+
+message PasswdRequest {
+    int64 uid = 1;
+    string old_pass = 2;
+    string new_pass = 3;
+}
+
+message PasswdResponse {
 }
 
 message InfoRequest {

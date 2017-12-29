@@ -63,6 +63,32 @@ func (s *Server) Info(ctx context.Context, req *user.InfoRequest,
 	return nil
 }
 
+//UpdatePasswd update user passwd
+func (s *Server) UpdatePasswd(ctx context.Context, req *user.PasswdRequest,
+	rsp *user.PasswdResponse) error {
+	var epass, salt string
+	err := db.QueryRow(`SELECT passwd, salt FROM users WHERE uid = ?`, req.Uid).
+		Scan(&epass, &salt)
+	if err != nil {
+		log.Printf("UpdatePasswd query failed:%d %v", req.Uid, err)
+		return err
+	}
+	if strutil.MD5(req.OldPass+salt) != epass {
+		log.Printf("UpdatePasswd passwd not matched:%d", req.Uid)
+		return errors.New("passwd not matched")
+	}
+	salt = strutil.GenSalt()
+	epass = strutil.MD5(req.NewPass + salt)
+	_, err = db.Exec(`UPDATE users SET passwd = ?, salt = ? WHERE uid = ?`,
+		epass, salt, req.Uid)
+	if err != nil {
+		log.Printf("UpdatePasswd update info failed:%d %v", req.Uid, err)
+		return err
+	}
+
+	return nil
+}
+
 func main() {
 	var err error
 	db, err = dbutil.NewDB(accounts.DbDsn)

@@ -19,6 +19,8 @@ func userHandler(c *gin.Context) {
 		userLogin(c)
 	case "summary":
 		getUserSummary(c)
+	case "update_passwd":
+		updateUserPasswd(c)
 	default:
 		c.JSON(http.StatusOK, gin.H{"errno": 101, "desc": "unknown action"})
 	}
@@ -73,4 +75,21 @@ func getUserSummary(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"errno": 0, "userinfo": ursp,
 		"items": orsp.Infos})
+}
+
+func updateUserPasswd(c *gin.Context) {
+	var req user.PasswdRequest
+	if err := c.BindJSON(&req); err != nil {
+		c.JSON(http.StatusOK, gin.H{"errno": 102, "desc": "illegal param"})
+		return
+	}
+
+	cl := user.NewUserClient(accounts.UserService, client.DefaultClient)
+	rsp, err := cl.UpdatePasswd(context.Background(), &req)
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{"errno": 1, "desc": err.Error()})
+		return
+	}
+	log.Printf("rsp:%+v", rsp)
+	c.JSON(http.StatusOK, gin.H{"errno": 0})
 }
