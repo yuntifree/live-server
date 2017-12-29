@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	"errors"
 	"log"
 	"time"
 
@@ -43,6 +44,41 @@ func (s *Server) GetRecords(ctx context.Context, req *withdraw.GetRequest,
 		infos = append(infos, &rec)
 	}
 	rsp.Infos = infos
+	return nil
+}
+
+//Apply apply withdraw
+func (s *Server) Apply(ctx context.Context, req *withdraw.ApplyRequest,
+	rsp *withdraw.ApplyResponse) error {
+	var income, apply, withdraw int64
+	err := db.QueryRow(`SELECT income, apply, withdraw FROM user_info WHERE uid = ?`,
+		req.Uid).Scan(&income, &apply, &withdraw)
+	if err != nil {
+		log.Printf("Apply query info failed:%d %v", req.Uid, err)
+		return err
+	}
+	if req.Amount+apply+withdraw > income {
+		log.Printf("not sufficient remain charge:%d %d", req.Uid, req.Amount)
+		return errors.New("not sufficient charge")
+	}
+	res, err := db.Exec(`INSERT INTO withdraw_history(uid, amount, remark, ctime)
+	VALUES (?, ?, ?, NOW())`, req.Uid, req.Amount, req.Remark)
+	if err != nil {
+		log.Printf("Apply insert withdraw failed:%d %v", req.Uid, err)
+		return err
+	}
+	_, err = db.Exec(`UPDATE user_info SET apply = apply + ? WHERE uid = ?`,
+		req.Amount, req.Uid)
+	if err != nil {
+		log.Printf("Apply update user info failed:%d %v", req.Uid, err)
+		return err
+	}
+	id, err := res.LastInsertId()
+	if err != nil {
+		log.Printf("Apply get insert id failed:%d %v", req.Uid, err)
+		return err
+	}
+	rsp.Id = id
 	return nil
 }
 

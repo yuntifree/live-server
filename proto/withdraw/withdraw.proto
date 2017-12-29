@@ -4,6 +4,17 @@ package withdraw;
 
 service Withdraw {
     rpc GetRecords(GetRequest) returns (RecordsResponse) {}
+    rpc Apply(ApplyRequest) returns (ApplyResponse) {}
+}
+
+message ApplyRequest {
+    int64 uid = 1;
+    int64 amount = 2;
+    string remark = 3;
+}
+
+message ApplyResponse {
+    int64 id = 1;
 }
 
 message GetRequest {
