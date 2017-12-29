@@ -22,8 +22,9 @@ type Server struct{}
 //Add add feedback
 func (s *Server) Add(ctx context.Context, req *feedback.AddRequest,
 	rsp *feedback.AddResponse) error {
-	res, err := db.Exec(`INSERT INTO feedback(uid, title, content, ctime)
-	VALUES (?, ?, ?, NOW())`, req.Info.Uid, req.Info.Title, req.Info.Content)
+	res, err := db.Exec(`INSERT INTO feedback(uid, title, content, img, ctime)
+	VALUES (?, ?, ?, ?, NOW())`, req.Info.Uid, req.Info.Title, req.Info.Content,
+		req.Info.Img)
 	if err != nil {
 		log.Printf("Add insert failed:%+v %v", req, err)
 		return err
@@ -40,7 +41,7 @@ func (s *Server) Add(ctx context.Context, req *feedback.AddRequest,
 //GetRecords get feedback records
 func (s *Server) GetRecords(ctx context.Context, req *feedback.GetRequest,
 	rsp *feedback.RecordsResponse) error {
-	rows, err := db.Query(`SELECT id, title, content FROM feedback 
+	rows, err := db.Query(`SELECT id, title, content, img, status FROM feedback 
 	WHERE uid = ? ORDER BY id DESC LIMIT ?, ?`, req.Uid,
 		req.Seq, req.Num)
 	if err != nil {
@@ -51,7 +52,8 @@ func (s *Server) GetRecords(ctx context.Context, req *feedback.GetRequest,
 	var infos []*feedback.Info
 	for rows.Next() {
 		var info feedback.Info
-		err = rows.Scan(&info.Id, &info.Title, &info.Content)
+		err = rows.Scan(&info.Id, &info.Title, &info.Content,
+			&info.Img, &info.Status)
 		if err != nil {
 			continue
 		}

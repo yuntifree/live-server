@@ -22,6 +22,9 @@ message Info {
     int64 uid = 2;
     string title = 3;
     string content = 4;
+    string img = 5;
+    string ctime = 6;
+    int64 status = 7;
 }
 
 message AddRequest {

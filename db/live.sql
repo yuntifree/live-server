@@ -176,6 +176,8 @@ CREATE TABLE IF NOT EXISTS feedback
     title   varchar(128) NOT NULL DEFAULT '',
     content varchar(512) NOT NULL DEFAULT '',
     ctime   datetime NOT NULL DEFAULT '2017-12-01',
+    img     varchar(128) NOT NULL DEFAULT '',
+    status  tinyint unsigned NOT NULL DEFAULT 0,
     PRIMARY KEY(id),
     KEY(uid)
 ) ENGINE = InnoDB;
