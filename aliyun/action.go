@@ -27,7 +27,7 @@ func GenPushURL(name string, uid int64) string {
 func genAuthStream(name string, uid int64) string {
 	uri := "/" + appname + "/" + name
 	ts := time.Now().Unix() + 3600
-	auth := GenAuthKey(uri, accessKeySecret, ts, 0, uid)
+	auth := GenAuthKey(uri, authKey, ts, 0, uid)
 	return fmt.Sprintf("%s?vhost=%s&auth_key=%d-0-%d-%s",
 		name, vhost, ts, uid, auth)
 }
@@ -49,19 +49,29 @@ func getResolutionID(resolution int64) string {
 
 //GenLiveHLS generate live hls url
 func GenLiveHLS(name string) string {
-	return fmt.Sprintf("http://%s/%s.m3u8", vhost, name)
+	ts := time.Now().Unix()
+	str := fmt.Sprintf("/%s/%s.m3u8-%d-0-0-%s", appname, name, ts, authKey)
+	sign := strutil.MD5(str)
+	return fmt.Sprintf("http://%s/%s/%s.m3u8?auth_key=%d-0-0-%s", vhost, appname, name,
+		ts, sign)
 }
 
 //GenLiveRTMP generate live rtmp
 func GenLiveRTMP(name string, resolution int64) string {
+	ts := time.Now().Unix()
 	id := getResolutionID(resolution)
-	return fmt.Sprintf("rtmp://%s/%s_%s", vhost, name, id)
+	str := fmt.Sprintf("/%s/%s_%s-%d-0-0-%s", appname, name, id, ts, authKey)
+	sign := strutil.MD5(str)
+	return fmt.Sprintf("rtmp://%s/%s_%s?auth_key=%d-0-0-%s", vhost, name, id, ts, sign)
 }
 
 //GenLiveFLV generate live flv
 func GenLiveFLV(name string, resolution int64) string {
+	ts := time.Now().Unix()
 	id := getResolutionID(resolution)
-	return fmt.Sprintf("http://%s/%s_%s.flv", vhost, name, id)
+	str := fmt.Sprintf("/%s/%s_%s.flv-%d-0-0-%s", appname, name, id, ts, authKey)
+	sign := strutil.MD5(str)
+	return fmt.Sprintf("http://%s/%s_%s.flv?auth_key=%d-0-0-%s", vhost, name, id, ts, sign)
 }
 
 func genSign(m map[string]string, key string) string {

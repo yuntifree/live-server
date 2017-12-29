@@ -12,4 +12,5 @@ const (
 	appname         = "apptest"
 	pushHost        = "rtmp://video-center.alivecdn.com"
 	apiHost         = "https://live.aliyuncs.com"
+	authKey         = "Yunti2016"
 )
