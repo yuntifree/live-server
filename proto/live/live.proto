@@ -6,6 +6,19 @@ service Live {
     rpc Create(CreateRequest) returns (CreateResponse) {}
     rpc Stop(StopRequest) returns (StopResponse) {}
     rpc GetRecords(GetRequest) returns (RecordResponse) {}
+    rpc NotifyPush(NotifyRequest) returns (NotifyResponse) {}
+}
+
+message NotifyRequest {
+    string action = 1;
+    string ip = 2;
+    string app = 3;
+    string appname = 4;
+    string id = 5;
+    int64 time = 6;
+}
+
+message NotifyResponse {
 }
 
 message GetRequest {

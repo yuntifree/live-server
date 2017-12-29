@@ -17,6 +17,15 @@ import (
 	live "github.com/yuntifree/live-server/proto/live"
 )
 
+const (
+	pushAction  = "publish"
+	pauseAction = "publish_done"
+	initStatus  = 0
+	pushStatus  = 1
+	stopStatus  = 2
+	pauseStatus = 3
+)
+
 var db *sql.DB
 
 //Server server  implement
@@ -49,13 +58,24 @@ func (s *Server) Create(ctx context.Context, req *live.CreateRequest,
 	}
 
 	push := aliyun.GenPushURL(name, req.Uid)
-	_, err = db.Exec(`INSERT INTO live_history(uid, title, cover,
+	res, err := db.Exec(`INSERT INTO live_history(uid, title, cover,
 	depict, authority, passwd, price, resolution, push, ctime) 
 	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())`, req.Uid,
 		req.Title, req.Cover, req.Depict, req.Authority, req.Passwd,
 		req.Price, req.Resolution, push)
 	if err != nil {
 		log.Printf("Create insert history failed:%d %v", req.Uid, err)
+		return err
+	}
+	id, err := res.LastInsertId()
+	if err != nil {
+		log.Printf("Create get history id failed:%d %v", req.Uid, err)
+		return err
+	}
+	_, err = db.Exec(`UPDATE stream SET cur_id = ?, status = 0 WHERE uid = ?`,
+		id, req.Uid)
+	if err != nil {
+		log.Printf("Create update stream info failed:%d %v", req.Uid, err)
 		return err
 	}
 	rsp.Push = push
@@ -86,6 +106,52 @@ func (s *Server) Stop(ctx context.Context, req *live.StopRequest,
 		log.Printf("Stop update history failed:%d %v", req.Id, err)
 		return err
 	}
+	_, err = db.Exec(`UPDATE stream SET status = 2 WHERE uid = ?`, req.Uid)
+	if err != nil {
+		log.Printf("Stop update stream status failed:%d %v", req.Uid, err)
+		return err
+	}
+	return nil
+}
+
+//NotifyPush notify stream push status
+func (s *Server) NotifyPush(ctx context.Context, req *live.NotifyRequest,
+	rsp *live.NotifyResponse) error {
+	var id, curid, status int64
+	err := db.QueryRow(`SELECT id, cur_id, status FROM stream WHERE name = ?`,
+		req.Id).Scan(&id, &curid, &status)
+	if err != nil {
+		log.Printf("NotifyPush query info failed:%s %v", req.Id, err)
+		return err
+	}
+	var nowStatus int64
+	if req.Action == pushAction {
+		if status == initStatus {
+			nowStatus = pushStatus
+		} else {
+			return nil
+		}
+	} else if req.Action == pauseAction {
+		if status == pushStatus {
+			nowStatus = pauseStatus
+		} else {
+			return nil
+		}
+	}
+	_, err = db.Exec(`UPDATE live_history SET status = ? WHERE id = ?`,
+		nowStatus, curid)
+	if err != nil {
+		log.Printf("NotifyPush update status failed:%s %v", req.Id, err)
+		return err
+	}
+
+	_, err = db.Exec(`UPDATE stream SET status = ? WHERE id = ?`,
+		nowStatus, id)
+	if err != nil {
+		log.Printf("NotifyPush update stream status failed:%s %v", req.Id, err)
+		return err
+	}
+
 	return nil
 }
 

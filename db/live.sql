@@ -49,7 +49,7 @@ CREATE TABLE IF NOT EXISTS stream
     name    varchar(36) NOT NULL DEFAULT '',
     ctime   datetime NOT NULL DEFAULT '2017-12-01',
     uid     int unsigned NOT NULL DEFAULT 0,
-    -- status 0:创建 1-推流
+    -- status 0:创建 1-推流 2-停止 3-暂停
     status  tinyint unsigned NOT NULL DEFAULT 0,
     cur_id  int unsigned NOT NULL DEFAULT 0,
     PRIMARY KEY(id),
@@ -71,6 +71,8 @@ CREATE TABLE IF NOT EXISTS live_history
     resolution tinyint unsigned NOT NULL DEFAULT 0,
     push    varchar(256) NOT NULL DEFAULT '',
     replay  varchar(256) NOT NULL DEFAULT '',
+    -- status 0:创建 1-推流 2-停止 3-暂停
+    status  tinyint unsigned NOT NULL DEFAULT 0,
     ctime   datetime NOT NULL DEFAULT '2017-12-01',
     ftime   datetime NOT NULL DEFAULT '2017-12-01',
     PRIMARY KEY(id),

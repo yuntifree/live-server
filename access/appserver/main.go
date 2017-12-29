@@ -21,6 +21,7 @@ func main() {
 	router.POST("/wxpay/:action", wxpayHandler)
 	router.POST("/channel/:action", channelHandler)
 	router.POST("/feedback/:action", feedbackHandler)
+	router.GET("/live/:action", notifyHandler)
 
 	srv := &http.Server{
 		Addr:    ":9898",
